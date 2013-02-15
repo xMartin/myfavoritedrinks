@@ -16,6 +16,8 @@
     inputElement = formElement.getElementsByTagName('input')[0];
     ulElement = document.getElementById('drink-list');
 
+    loadDrinks();
+
     ulElement.addEventListener('click', function(event) {
       if(event.target.tagName === 'SPAN') {
         removeDrink(unprefixId(event.target.parentNode.id));
@@ -32,13 +34,33 @@
     });
   }
 
+  function loadDrinks() {
+    var drinks = {};
+    for (var i = 0, l = localStorage.length; i < l; ++i) {
+      var id = localStorage.key(i);
+      if (id.indexOf('drink-') === 0) {
+        var value = localStorage.getItem(id);
+        drinks[id.substr(6)] = {name: value};
+      }
+    }
+    displayDrinks(drinks);
+  }
+
   function addDrink(name) {
     var id = name.toLowerCase().replace(/\s|\//g, '-');
+    localStorage.setItem('drink-' + id, name);
     displayDrink(id, name);
   }
 
   function removeDrink(id) {
+    localStorage.removeItem('drink-' + id);
     undisplayDrink(id);
+  }
+
+  function displayDrinks(drinks) {
+    for(var drinkId in drinks) {
+      displayDrink(drinkId, drinks[drinkId].name);
+    }
   }
 
   function displayDrink(id, name) {
